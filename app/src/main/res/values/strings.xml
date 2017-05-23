@@ -17,4 +17,11 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
+
+    <!--String relate to camera -->
+    <string name="take_picture">Take Picture</string>
+    <string name="edit_photo">Edit Photo</string>
+    <string name="find_object">框出目標</string>
+    <string name="photo_provider">org.dress.mydress.take_picture_fileprovider</string>
+    <string name="camera_preedit">PreEdit Photo</string>
 </resources>
