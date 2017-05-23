@@ -37,7 +37,7 @@
 
         <provider
             android:name="android.support.v4.content.FileProvider"
-            android:authorities="org.dress.mydress.take_picture_fileprovider"
+            android:authorities="@string/photo_provider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

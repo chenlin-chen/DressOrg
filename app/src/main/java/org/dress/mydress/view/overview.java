@@ -116,7 +116,7 @@ public class overview extends AppCompatActivity {
             }
             // Continue only if the File was successfully created
             if (m_photofile != null) {
-                Uri photoURI = FileProvider.getUriForFile(this, "org.dress.mydress.take_picture_fileprovider", m_photofile);
+                Uri photoURI = FileProvider.getUriForFile(this, getString(R.string.photo_provider), m_photofile);
                 takePictureIntent.putExtra("return-data", false);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 startActivityForResult(takePictureIntent, CAMERA_REQUEST);
