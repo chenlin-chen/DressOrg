@@ -24,4 +24,5 @@
     <string name="find_object">框出目標</string>
     <string name="photo_provider">org.dress.mydress.take_picture_fileprovider</string>
     <string name="camera_preedit">PreEdit Photo</string>
+    <string name="camera_select_photo">Select Photo</string>
 </resources>
