@@ -6,8 +6,9 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
-    <!--ask  camera  and file read and write perimission-->
-    <uses-feature android:name="android.hardware.camera"></uses-feature>
+    <!-- ask  camera  and file read and write perimission -->
+    <uses-feature android:name="android.hardware.camera" />
+
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
@@ -28,12 +29,14 @@
             </intent-filter>
         </activity>
 
-
         <activity
             android:name=".LoginActivity"
             android:label="@string/title_activity_login" />
         <activity android:name=".view.camera" />
-        <activity android:name=".view.clothes"></activity>
+
+        <activity android:name=".view.clothes" />
+
+        <activity android:name=".view.custom_photo_gallery"></activity>
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -42,8 +45,7 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/picture_savepath">
-            </meta-data>
+                android:resource="@xml/picture_savepath"></meta-data>
         </provider>
 
     </application>

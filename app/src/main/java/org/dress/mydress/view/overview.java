@@ -62,11 +62,16 @@ public class overview extends AppCompatActivity {
         setContentView(R.layout.activity_overview);
 
         mTextMessage = (TextView) findViewById(R.id.message);
-        mBottomView =(BottomNavigationView) findViewById(R.id.navigation);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        init();
     }
 
+    private  void init()
+    {
+        mBottomView =(BottomNavigationView) findViewById(R.id.navigation);
+        CheckAlbumDir();
+    }
     private void PopupHomeMenu(){
         PopupMenu popup = new PopupMenu(overview.this, mBottomView);
         popup.getMenuInflater().inflate(R.menu.home_menu, popup.getMenu());
@@ -83,6 +88,8 @@ public class overview extends AppCompatActivity {
                         return true;
                     }
                     case R.id.home_edit_photo: {
+                        if(!HasReadAndWriteExteranlStoragePermission())
+                            RequestReadAndWritePermission();
                         Intent edit_photo_intent = new Intent();
                         edit_photo_intent.setClass(overview.this  , camera.class);
                         startActivity(edit_photo_intent);
@@ -136,12 +143,14 @@ public class overview extends AppCompatActivity {
 
     private File getAlbumDir()
     {
+        return this.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+    }
+    private void CheckAlbumDir()
+    {
         File storage_dir = this.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         if(!storage_dir.exists())
             storage_dir.mkdir();
-        return storage_dir;
     }
-
     private void RequestReadAndWritePermission()
     {
         int REQUEST_READWRITE_STORAGE = 1;
@@ -159,10 +168,11 @@ public class overview extends AppCompatActivity {
         {
             if(resultCode == Activity.RESULT_OK)
             {
-                Intent edit_photo_intent = new Intent();
-                edit_photo_intent.setClass(overview.this, camera.class);
-                edit_photo_intent.putExtra("photofile",m_photofile.toString());
-                startActivity(edit_photo_intent);
+                // start  edit_photo_intent
+                //Intent edit_photo_intent = new Intent();
+                //edit_photo_intent.setClass(overview.this, camera.class);
+                //edit_photo_intent.putExtra("photofile",m_photofile.toString());
+                //startActivity(edit_photo_intent);
             }else if(resultCode == Activity.RESULT_CANCELED)
                m_photofile.delete();
         }
