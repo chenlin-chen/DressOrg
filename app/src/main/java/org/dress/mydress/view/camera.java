@@ -11,12 +11,13 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.dress.mydress.Crop.CropImageView;
 import org.dress.mydress.R;
 
 
 public class camera extends AppCompatActivity {
 
-    ImageView mImageView = null;
+    CropImageView mEditImageView = null;
     Bitmap mBitmap = null;
     String mPhotoPath = null;
     private TextView mTextMessage;
@@ -33,7 +34,7 @@ public class camera extends AppCompatActivity {
 
     private void init()
     {
-        mImageView = (ImageView) findViewById(R.id.imgDisplay);
+        mEditImageView = (CropImageView) findViewById(R.id.EditImageView);
         m_preedit_buttom = (Button) findViewById(R.id.buttom_preedit);
         m_selectphoto_buttom = (Button) findViewById(R.id.buttom_select);
         mTextMessage = (TextView) findViewById(R.id.camera_textmessage);
@@ -73,7 +74,7 @@ public class camera extends AppCompatActivity {
         bmOptions.inJustDecodeBounds = false;
 
         mBitmap = BitmapFactory.decodeFile(photo_src, bmOptions);
-        mImageView.setImageBitmap(mBitmap);
+        mEditImageView.setImageBitmap(mBitmap);
     }
 
 
