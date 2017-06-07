@@ -1,9 +1,11 @@
 package org.dress.mydress.view;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -12,7 +14,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.dress.mydress.Crop.CropImageView;
+import org.dress.mydress.ImageProcess.ProcessData;
+import org.dress.mydress.ImageProcess.RemoveBackground;
 import org.dress.mydress.R;
+import org.opencv.android.OpenCVLoader;
+import org.opencv.core.Point;
 
 
 public class camera extends AppCompatActivity {
@@ -22,7 +28,6 @@ public class camera extends AppCompatActivity {
     String mPhotoPath = null;
     private TextView mTextMessage;
     private int PICK_IMAGE_REQUEST = 1;
-
     Button m_preedit_buttom ;
     Button m_selectphoto_buttom ;
     @Override
@@ -78,10 +83,16 @@ public class camera extends AppCompatActivity {
     }
 
 
+
     class CameraOnClickListener implements View.OnClickListener{
         public void onClick(View v){
             switch(v.getId()){
                 case R.id.buttom_preedit:
+                    if(SettingIsCorrect()) {
+
+                        DoRemoveBackground();
+                    }
+
                     break;
                 case R.id.buttom_select:
                     StartSelectPhoto();
@@ -90,20 +101,67 @@ public class camera extends AppCompatActivity {
         }
     }
 
+    private boolean SettingIsCorrect()
+    {
+        String Setting_error = null;
+        boolean has_opencv = OpenCVLoader.initDebug();
+        boolean has_editing_photo = (mPhotoPath!=null);
+        if(!has_opencv) {
+            Setting_error = getString(R.string.not_have_opencv);
+            if(!has_editing_photo)
+                Setting_error = Setting_error +',' +getString(R.string.not_have_photo);
+        }
+        else {
+            if (!has_editing_photo)
+                Setting_error = getString(R.string.not_have_photo);
+        }
+        boolean is_correct = has_opencv && has_editing_photo;
+
+        if(!is_correct)
+            PopupWarning(Setting_error);
+        return is_correct;
+    }
+
+    private void DoRemoveBackground()
+    {
+        if(mPhotoPath!= null) {
+            //Bitmap test = mEditImageView.getCroppedImage();
+            //mEditImageView.setImageBitmap(test);
+            CropImageView.WindowLocData current_window =  mEditImageView.GetCurrentWindow();
+            Point top_left = new Point(current_window.start_x, current_window.start_y);
+            Point botton_right = new Point(current_window.end_x, current_window.end_y);
+            ProcessData remove_background_data = new ProcessData(mPhotoPath, top_left, botton_right);
+            new RemoveBackground(camera.this, mEditImageView).execute(remove_background_data);
+        }
+
+    }
+
+    private void PopupWarning(String warning_text)
+    {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(camera.this);	//main是class name
+        builder.setTitle("Warning");
+        builder.setMessage(warning_text);
+        builder.show();
+
+    }
+
     private void StartSelectPhoto()
     {
         //TODO: reference customer gallery(https://guides.codepath.com/android/Accessing-the-Camera-and-Stored-Media#file-pickers)
         Intent select_photo_intent = new Intent(camera.this, custom_photo_gallery.class);
         startActivityForResult(select_photo_intent, PICK_IMAGE_REQUEST);
     }
+
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         if (requestCode == PICK_IMAGE_REQUEST )
         {
             if(resultCode == Activity.RESULT_OK)
             {
-                String selected_mages = data.getStringExtra("data");
-                SetImageView(selected_mages);
+                mPhotoPath = data.getStringExtra("data");
+
+                SetImageView(mPhotoPath);
                 mTextMessage.setText(getString(R.string.find_object));
             }
 

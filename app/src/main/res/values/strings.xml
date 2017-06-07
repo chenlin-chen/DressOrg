@@ -26,4 +26,6 @@
     <string name="camera_preedit">PreEdit Photo</string>
     <string name="camera_select_photo">Please select photo</string>
     <string name="camera_photos">Photos</string>
+    <string name="not_have_opencv">Not Have Opencv </string>
+    <string name="not_have_photo">Not Have Photo </string>
 </resources>

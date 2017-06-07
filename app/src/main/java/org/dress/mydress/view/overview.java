@@ -88,11 +88,14 @@ public class overview extends AppCompatActivity {
                         return true;
                     }
                     case R.id.home_edit_photo: {
-                        if(!HasReadAndWriteExteranlStoragePermission())
+                        if(!HasReadAndWriteExteranlStoragePermission()) {
                             RequestReadAndWritePermission();
-                        Intent edit_photo_intent = new Intent();
-                        edit_photo_intent.setClass(overview.this  , camera.class);
-                        startActivity(edit_photo_intent);
+                        }
+                        else {
+                            Intent edit_photo_intent = new Intent();
+                            edit_photo_intent.setClass(overview.this, camera.class);
+                            startActivity(edit_photo_intent);
+                        }
                         return true;
                     }
                 }

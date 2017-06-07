@@ -40,14 +40,24 @@ import org.dress.mydress.Crop.util.PaintUtil;
 
 public class CropImageView extends AppCompatImageView {
 
+    public class WindowLocData
+    {   public int start_x;
+        public int start_y;
+        public int end_x;
+        public int end_y;
+        WindowLocData()
+        {
+            start_x = 0;
+            start_y = 0;
+            end_x = 0;
+            end_y = 0;
+        }
+    }
 
     @SuppressWarnings("unused")
     private static final String TAG = CropImageView.class.getName();
 
     @SuppressWarnings("unused")
-    public static final int GUIDELINES_OFF = 0;
-    public static final int GUIDELINES_ON_TOUCH = 1;
-    public static final int GUIDELINES_ON = 2;
 
     // Member Variables ////////////////////////////////////////////////////////////////////////////
 
@@ -101,8 +111,6 @@ public class CropImageView extends AppCompatImageView {
     private int mAspectRatioX = 1;
     private int mAspectRatioY = 1;
 
-    // Mode indicating how/whether to show the guidelines; must be one of GUIDELINES_OFF, GUIDELINES_ON_TOUCH, GUIDELINES_ON.
-    private int mGuidelinesMode = 1;
 
     // Constructors ////////////////////////////////////////////////////////////////////////////////
 
@@ -124,7 +132,6 @@ public class CropImageView extends AppCompatImageView {
     private void init(@NonNull Context context, @Nullable AttributeSet attrs) {
 
         final TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.CropImageView, 0, 0);
-        mGuidelinesMode = typedArray.getInteger(R.styleable.CropImageView_guidelines, 1);
         mFixAspectRatio = typedArray.getBoolean(R.styleable.CropImageView_fixAspectRatio, false);
         mAspectRatioX = typedArray.getInteger(R.styleable.CropImageView_aspectRatioX, 1);
         mAspectRatioY = typedArray.getInteger(R.styleable.CropImageView_aspectRatioY, 1);
@@ -196,17 +203,6 @@ public class CropImageView extends AppCompatImageView {
 
     // Public Methods //////////////////////////////////////////////////////////////////////////////
 
-    /**
-     * Sets the guidelines for the CropOverlayView to be either on, off, or to show when resizing
-     * the application.
-     *
-     * @param guidelinesMode Integer that signals whether the guidelines should be on, off, or only
-     *                       showing when resizing.
-     */
-    public void setGuidelines(int guidelinesMode) {
-        mGuidelinesMode = guidelinesMode;
-        invalidate(); // Request onDraw() to get called again.
-    }
 
     /**
      * Sets whether the aspect ratio is fixed or not; true fixes the aspect ratio, while false
@@ -289,6 +285,55 @@ public class CropImageView extends AppCompatImageView {
                                    (int) cropY,
                                    (int) cropWidth,
                                    (int) cropHeight);
+    }
+
+    /**
+     * Gets the Object Range in image based on the current crop window.
+     *
+     * @return a new Bitmap representing the cropped image
+     */
+    public WindowLocData GetCurrentWindow() {
+
+        // Implementation reference: http://stackoverflow.com/a/26930938/1068656
+
+        final Drawable drawable = getDrawable();
+        if (drawable == null || !(drawable instanceof BitmapDrawable)) {
+            return null;
+        }
+
+        // Get image matrix values and place them in an array.
+        final float[] matrixValues = new float[9];
+        getImageMatrix().getValues(matrixValues);
+
+        // Extract the scale and translation values. Note, we currently do not handle any other transformations (e.g. skew).
+        final float scaleX = matrixValues[Matrix.MSCALE_X];
+        final float scaleY = matrixValues[Matrix.MSCALE_Y];
+        final float transX = matrixValues[Matrix.MTRANS_X];
+        final float transY = matrixValues[Matrix.MTRANS_Y];
+
+        // Ensure that the left and top edges are not outside of the ImageView bounds.
+        final float bitmapLeft = (transX < 0) ? Math.abs(transX) : 0;
+        final float bitmapTop = (transY < 0) ? Math.abs(transY) : 0;
+
+        // Get the original bitmap object.
+        final Bitmap originalBitmap = ((BitmapDrawable) drawable).getBitmap();
+
+        // Calculate the top-left corner of the crop window relative to the ~original~ bitmap size.
+        final float cropX = (bitmapLeft + Edge.LEFT.getCoordinate()) / scaleX;
+        final float cropY = (bitmapTop + Edge.TOP.getCoordinate()) / scaleY;
+
+        // Calculate the crop window size relative to the ~original~ bitmap size.
+        // Make sure the right and bottom edges are not outside the ImageView bounds (this is just to address rounding discrepancies).
+        final float cropWidth = Math.min(Edge.getWidth() / scaleX, originalBitmap.getWidth() - cropX);
+        final float cropHeight = Math.min(Edge.getHeight() / scaleY, originalBitmap.getHeight() - cropY);
+
+        // Crop the subset from the original Bitmap.
+        WindowLocData window_data = new WindowLocData();
+        window_data.start_x = (int)cropX;
+        window_data.start_y = (int)cropY;
+        window_data.end_x = (int)(cropX+cropWidth);
+        window_data.end_y = (int)(cropY+cropHeight);
+        return window_data;
     }
 
     // Private Methods /////////////////////////////////////////////////////////////////////////////
