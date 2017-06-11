@@ -93,7 +93,7 @@ public class overview extends AppCompatActivity {
                         }
                         else {
                             Intent edit_photo_intent = new Intent();
-                            edit_photo_intent.setClass(overview.this, camera.class);
+                            edit_photo_intent.setClass(overview.this, preedit.class);
                             startActivity(edit_photo_intent);
                         }
                         return true;

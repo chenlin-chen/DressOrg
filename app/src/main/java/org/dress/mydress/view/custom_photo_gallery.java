@@ -30,6 +30,7 @@ public class custom_photo_gallery extends AppCompatActivity {
     ImageAdapter myImageAdapter;
     private Button button_select;
     private GridView gridview;
+    Toast toast = null;
     private boolean[] nthumbnailsselection;
     private  String photo_director = null;
     private  File[] photo_list = null;
@@ -41,8 +42,6 @@ public class custom_photo_gallery extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_custom_photo_gallery);
         init();
-        String targetPath = this.getExternalFilesDir(Environment.DIRECTORY_PICTURES).getAbsolutePath();
-        Toast.makeText(getApplicationContext(), targetPath, Toast.LENGTH_LONG).show();
         AddImagetoImageAdapter();
 
     }
@@ -75,9 +74,8 @@ public class custom_photo_gallery extends AppCompatActivity {
                 }
             }
             if (cnt == 0) {
-                Toast.makeText(getApplicationContext(), "Please select at least one image", Toast.LENGTH_LONG).show();
+                makeTextAndShow(custom_photo_gallery.this,getString(R.string.select_photo),Toast.LENGTH_SHORT);
             } else {
-                Log.d("SelectedImages", selectImages);
                 Intent select_result = new Intent();
                 select_result.putExtra("data", selectImages);
                 setResult(Activity.RESULT_OK, select_result);
@@ -86,6 +84,16 @@ public class custom_photo_gallery extends AppCompatActivity {
         }
     };
 
+    private  void makeTextAndShow(final Context context, final String text, final int duration) {
+        if (toast == null) {
+            //如果還沒有用過makeText方法，才使用
+            toast = Toast.makeText(context, text, duration);
+        } else {
+            toast.setText(text);
+            toast.setDuration(duration);
+        }
+        toast.show();
+    }
     private  void AddImagetoImageAdapter( )
     {
         for (File file : photo_list){
@@ -95,7 +103,6 @@ public class custom_photo_gallery extends AppCompatActivity {
 
     public class ImageAdapter extends BaseAdapter {
 
-        int counter = 0;
         int selected_id = 0;
         private Context mContext;
         ArrayList<String> itemList = new ArrayList<String>();
@@ -131,8 +138,8 @@ public class custom_photo_gallery extends AppCompatActivity {
                 int id;
             }
             final ViewHolder holder;
+
             if (convertView == null) {
-                counter++;
                 holder = new ViewHolder();
                 convertView = mInflater.inflate(R.layout.custom_gallery_item, null);
                 holder.imgThumb = (ImageView) convertView.findViewById(R.id.gallery_imgthumb);
@@ -190,12 +197,10 @@ public class custom_photo_gallery extends AppCompatActivity {
                 }
             });
 
-
             Bitmap bm = decodeSampledBitmapFromUri(itemList.get(position), 400, 400);
             holder.imgThumb.setImageBitmap(bm);
             holder.chkImage.setChecked(nthumbnailsselection[position]);
             holder.id = position;
-            Log.i("-getView-", String.valueOf(counter));
             return convertView;
         }
 
@@ -230,7 +235,6 @@ public class custom_photo_gallery extends AppCompatActivity {
                     inSampleSize = Math.round((float)width / (float)reqWidth);
                 }
             }
-
             return inSampleSize;
         }
 

@@ -128,6 +128,9 @@ public class RemoveBackground extends AsyncTask<ProcessData, Integer, Integer> {
 
     private double CaluResizeRation(double sum_pixel, double img_h, double img_w)
     {
+        double nowsum_pixel = img_h*img_w;
+        if(nowsum_pixel<= sum_pixel)
+            return  1;
         return Math.sqrt(sum_pixel/img_h/img_w);
     }
     private void ResizePoint(Point top_l, Point bot_r, double ration)

@@ -28,15 +28,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".LoginActivity"
             android:label="@string/title_activity_login" />
         <activity android:name=".view.camera" />
-
         <activity android:name=".view.clothes" />
-
-        <activity android:name=".view.custom_photo_gallery"></activity>
+        <activity android:name=".view.preedit" />
+        <activity android:name=".view.custom_photo_gallery" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -45,7 +43,7 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/picture_savepath"></meta-data>
+                android:resource="@xml/picture_savepath" />
         </provider>
 
     </application>

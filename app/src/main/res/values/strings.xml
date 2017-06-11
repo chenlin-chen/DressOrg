@@ -18,9 +18,10 @@
         completions."
     </string>
 
-    <!--String relate to camera -->
+    <!--String relate to overview -->
     <string name="take_picture">Take Picture</string>
     <string name="edit_photo">Edit Photo</string>
+    <!--String relate to preedit _view-->
     <string name="find_object">框出目標</string>
     <string name="photo_provider">org.dress.mydress.take_picture_fileprovider</string>
     <string name="camera_preedit">PreEdit Photo</string>
@@ -28,4 +29,6 @@
     <string name="camera_photos">Photos</string>
     <string name="not_have_opencv">Not Have Opencv </string>
     <string name="not_have_photo">Not Have Photo </string>
+    <!-- String releate to photo_gallery-->
+    <string name="select_photo"> Please select at least one image </string>
 </resources>
