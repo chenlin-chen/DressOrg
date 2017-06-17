@@ -8,33 +8,37 @@ import android.graphics.BitmapFactory;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.bumptech.glide.DrawableRequestBuilder;
+import com.bumptech.glide.Glide;
 
 import org.dress.mydress.R;
 
 import java.io.File;
 import java.util.ArrayList;
 
+
 public class custom_photo_gallery extends AppCompatActivity {
 
     ImageAdapter myImageAdapter;
-    private Button button_select;
     private GridView gridview;
     Toast toast = null;
     private boolean[] nthumbnailsselection;
+    private int selectedphoto_num = 0;
     private  String photo_director = null;
     private  File[] photo_list = null;
-
+    private  int photo_reqsize = 400;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -43,50 +47,145 @@ public class custom_photo_gallery extends AppCompatActivity {
         setContentView(R.layout.activity_custom_photo_gallery);
         init();
         AddImagetoImageAdapter();
-
     }
 
     private  void init()
     {
-        button_select= (Button) findViewById(R.id.btnSelect);
+
         gridview = (GridView) findViewById(R.id.gallery_gridimg);
-        myImageAdapter = new ImageAdapter();
+        myImageAdapter = new ImageAdapter(this);
         gridview.setAdapter(myImageAdapter);
         photo_director = this.getExternalFilesDir(Environment.DIRECTORY_PICTURES).getAbsolutePath();
         photo_list = new File(photo_director).listFiles();
         nthumbnailsselection = new boolean[photo_list.length];
-
-        button_select.setOnClickListener(SelectButtonClickListen);
-
+        //button_select= (Button) findViewById(R.id.btnSelect);
+        //button_select.setOnClickListener(SelectButtonClickListen);
     }
 
-    View.OnClickListener SelectButtonClickListen = new View.OnClickListener(){
-        @Override
-        public void onClick(View v) {
-            final int len = nthumbnailsselection.length;
-            int cnt = 0;
-            String selectImages = "";
+    private  void AddImagetoImageAdapter( )
+    {
+        for (File file : photo_list){
+            myImageAdapter.add_photo(file.getAbsolutePath());
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        getMenuInflater().inflate(R.menu.imgthumb_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.imgthumb_select_photo:
+                DoPreeditSelectPhoto();
+                return true;
+            case R.id.imgthumb_deleete_photo:
+                DoDeleteSelectedPhoto();
+                return true;
+            case R.id.imgthumb_cancel_photo:
+                DoCancelSelectBox();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void DoPreeditSelectPhoto()
+    {
+        if (selectedphoto_num  == 0) {
+            makeTextAndShow(custom_photo_gallery.this,getString(R.string.not_select_photo),Toast.LENGTH_SHORT);
+        } else if(selectedphoto_num == 1){
+            String selected_photos = GetEditPhoto();
+            Intent select_result = new Intent();
+            select_result.putExtra("data", selected_photos);
+            setResult(Activity.RESULT_OK, select_result);
+            finish();
+        }
+        else
+        {
+            makeTextAndShow(custom_photo_gallery.this,getString(R.string.many_select_photo),Toast.LENGTH_SHORT);
+        }
+    }
+
+    private void DoCancelSelectBox()
+    {
+        if(selectedphoto_num > 0 )
+        {
+            int len = nthumbnailsselection.length;
             for (int i = 0; i < len; i++) {
-                if (nthumbnailsselection[i]) {
-                    cnt++;
-                    selectImages = photo_list[i].getAbsolutePath();
-                    //selectImages = selectImages + arrPath[i] + "|";
+                nthumbnailsselection[i] = false;
+            }
+            selectedphoto_num = 0;
+            myImageAdapter.notifyDataSetChanged();
+        }
+    }
+
+    private void DoDeleteSelectedPhoto()
+    {
+        if(selectedphoto_num > 0)
+        {
+            int photo_num = nthumbnailsselection.length;
+            int deletedphoto_num = 0;
+            for (int i = 0; i < photo_num; i++) {
+                if(nthumbnailsselection[i])
+                {
+                    String photo_name = myImageAdapter.remove_photo(i-deletedphoto_num);
+                    DeleteFile(photo_name);
+                    ++deletedphoto_num;
                 }
             }
-            if (cnt == 0) {
-                makeTextAndShow(custom_photo_gallery.this,getString(R.string.select_photo),Toast.LENGTH_SHORT);
-            } else {
+            photo_num -= selectedphoto_num;
+            nthumbnailsselection =new boolean[photo_num];
+            selectedphoto_num = 0;
+            photo_list = new File(photo_director).listFiles();
+            myImageAdapter.notifyDataSetChanged();
+        }
+    }
+
+    private String GetEditPhoto()
+    {
+        int len = nthumbnailsselection.length;
+        String select_photos = "";
+        for (int i = 0; i < len; i++) {
+            if (nthumbnailsselection[i]) {
+                select_photos = photo_list[i].getAbsolutePath();
+                break;
+            }
+        }
+        return  select_photos;
+    }
+
+    private void DeleteFile(String file_path)
+    {
+        File file= new File(file_path);
+        if(file.exists())
+            file.delete();
+    }
+
+    /*View.OnClickListener SelectButtonClickListen = new View.OnClickListener(){
+        @Override
+        public void onClick(View v) {
+            if (selectedphoto_num  == 0) {
+                makeTextAndShow(custom_photo_gallery.this,getString(R.string.not_select_photo),Toast.LENGTH_SHORT);
+            } else if(selectedphoto_num == 1){
+                String selected_photos = GetEditPhoto();
                 Intent select_result = new Intent();
-                select_result.putExtra("data", selectImages);
+                select_result.putExtra("data", selected_photos);
                 setResult(Activity.RESULT_OK, select_result);
                 finish();
             }
+            else
+            {
+                makeTextAndShow(custom_photo_gallery.this,getString(R.string.many_select_photo),Toast.LENGTH_SHORT);
+            }
         }
-    };
+    };*/
 
     private  void makeTextAndShow(final Context context, final String text, final int duration) {
         if (toast == null) {
-            //如果還沒有用過makeText方法，才使用
             toast = Toast.makeText(context, text, duration);
         } else {
             toast.setText(text);
@@ -94,25 +193,21 @@ public class custom_photo_gallery extends AppCompatActivity {
         }
         toast.show();
     }
-    private  void AddImagetoImageAdapter( )
-    {
-        for (File file : photo_list){
-            myImageAdapter.add(file.getAbsolutePath());
-        }
-    }
+
 
     public class ImageAdapter extends BaseAdapter {
-
-        int selected_id = 0;
-        private Context mContext;
         ArrayList<String> itemList = new ArrayList<String>();
         private LayoutInflater mInflater;
-        private  CheckBox selectedCheckBox = null;
-        public ImageAdapter() {
-            mInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        private Context m_context;
+        class ViewHolder {
+            ImageView imgThumb;
+            CheckBox chkImage;
+            int id;
         }
-        void add(String path){
-            itemList.add(path);
+
+        public ImageAdapter( Context context ) {
+            m_context = context;
+            mInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         }
 
         @Override
@@ -131,14 +226,8 @@ public class custom_photo_gallery extends AppCompatActivity {
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            class ViewHolder {
-                ImageView imgThumb;
-                CheckBox chkImage;
-                int id;
-            }
+        public View getView(final int position, View convertView, ViewGroup parent) {
             final ViewHolder holder;
-
             if (convertView == null) {
                 holder = new ViewHolder();
                 convertView = mInflater.inflate(R.layout.custom_gallery_item, null);
@@ -148,94 +237,64 @@ public class custom_photo_gallery extends AppCompatActivity {
             } else {
                 holder = (ViewHolder) convertView.getTag();
             }
-            holder.imgThumb.setId(position);
-            holder.chkImage.setId(position);
 
             holder.imgThumb.setOnClickListener(new View.OnClickListener() {
 
                 public void onClick(View v) {
-                    int id = holder.imgThumb.getId();
+                    int id = holder.id;
                     if (nthumbnailsselection[id]) {
-                        selectedCheckBox.setChecked(false);
+                        holder.chkImage.setChecked(false);
                         nthumbnailsselection[id] = false;
-                        selectedCheckBox = null;
-                        Log.i("Cancel:", String.valueOf(id));
+                        --selectedphoto_num;
                     } else {
-                        if(selectedCheckBox !=null) {
-                            selectedCheckBox.setChecked(false);
-                            nthumbnailsselection[selected_id] = false;
-                        }
-                        selectedCheckBox = holder.chkImage;
-                        selected_id = id;
-                        selectedCheckBox.setChecked(true);
+                        holder.chkImage.setChecked(true);
                         nthumbnailsselection[id] = true;
-                        Log.i("Select::", String.valueOf(id));
+                        ++selectedphoto_num;
                     }
                 }
             });
 
             holder.chkImage.setOnClickListener(new View.OnClickListener() {
-
                 public void onClick(View v) {
-                    int id = holder.chkImage.getId();
+                    CheckBox cb = (CheckBox) v;
+                    int id = holder.id;
                     if (nthumbnailsselection[id]) {
-                        selectedCheckBox.setChecked(false);
+                        cb.setChecked(false);
                         nthumbnailsselection[id] = false;
-                        selectedCheckBox = null;
-                        Log.i("Cancel:", String.valueOf(id));
+                        --selectedphoto_num;
                     } else {
-                        if(selectedCheckBox !=null) {
-                            selectedCheckBox.setChecked(false);
-                            nthumbnailsselection[selected_id] = false;
-                        }
-                        selectedCheckBox = holder.chkImage;
-                        selected_id = id;
-                        selectedCheckBox.setChecked(true);
+                        cb.setChecked(true);
                         nthumbnailsselection[id] = true;
-                        Log.i("Select::", String.valueOf(id));
+                        ++selectedphoto_num;
                     }
                 }
             });
 
-            Bitmap bm = decodeSampledBitmapFromUri(itemList.get(position), 400, 400);
-            holder.imgThumb.setImageBitmap(bm);
+            String photo_path = itemList.get(position);
+            LoadPhotoThumbnai(photo_path,m_context,holder.imgThumb);
             holder.chkImage.setChecked(nthumbnailsselection[position]);
             holder.id = position;
             return convertView;
         }
 
-        public Bitmap decodeSampledBitmapFromUri(String path, int reqWidth, int reqHeight) {
+        private void LoadPhotoThumbnai(String photo_path, Context context, ImageView photo_view)
+        {
+            DrawableRequestBuilder<String> thumbnailRequest = Glide.with( context ).load(photo_path);
 
-            Bitmap bm = null;
-            // First decode with inJustDecodeBounds=true to check dimensions
-            final BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inJustDecodeBounds = true;
-            BitmapFactory.decodeFile(path, options);
-
-            // Calculate inSampleSize
-            options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
-
-            // Decode bitmap with inSampleSize set
-            options.inJustDecodeBounds = false;
-            bm = BitmapFactory.decodeFile(path, options);
-
-            return bm;
+            Glide.with( context )
+                 .load( photo_path )
+                 .placeholder(R.drawable.ic_notifications_black_24dp)
+                 .thumbnail( thumbnailRequest )
+                 .into( photo_view );
         }
 
-        public int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
-            // Raw height and width of image
-            final int height = options.outHeight;
-            final int width = options.outWidth;
-            int inSampleSize = 1;
+        void add_photo(String path){
+            itemList.add(path);
+        }
 
-            if (height > reqHeight || width > reqWidth) {
-                if (width > height) {
-                    inSampleSize = Math.round((float)height / (float)reqHeight);
-                } else {
-                    inSampleSize = Math.round((float)width / (float)reqWidth);
-                }
-            }
-            return inSampleSize;
+        String remove_photo(int index)
+        {
+            return  itemList.remove(index);
         }
 
     }

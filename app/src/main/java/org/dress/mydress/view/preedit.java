@@ -28,6 +28,7 @@ public class preedit extends AppCompatActivity {
     private int PICK_IMAGE_REQUEST = 1;
     Button m_preedit_buttom ;
     Button m_selectphoto_buttom ;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
