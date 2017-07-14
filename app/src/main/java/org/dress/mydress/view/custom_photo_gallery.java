@@ -3,8 +3,6 @@ package org.dress.mydress.view;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,7 +12,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -38,7 +35,7 @@ public class custom_photo_gallery extends AppCompatActivity {
     private int selectedphoto_num = 0;
     private  String photo_director = null;
     private  File[] photo_list = null;
-    private  int photo_reqsize = 400;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

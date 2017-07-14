@@ -25,9 +25,10 @@
     <!--String relate to preedit _view-->
     <string name="find_object">框出目標</string>
     <string name="photo_provider">org.dress.mydress.take_picture_fileprovider</string>
-    <string name="camera_preedit">PreEdit Photo</string>
-    <string name="camera_select_photo">Please select photo</string>
-    <string name="camera_photos">Photos</string>
+    <string name="photo_preedit">PreEdit Photo</string>
+    <string name="photo_edit">Edit Photo</string>
+    <string name="photo_select">Please select photo</string>
+    <string name="photos">Photos</string>
     <string name="not_have_opencv">Not Have Opencv </string>
     <string name="not_have_photo">Not Have Photo </string>
 

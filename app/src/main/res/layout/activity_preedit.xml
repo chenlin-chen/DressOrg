@@ -1,22 +1,23 @@
-<?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context="org.dress.mydress.view.preedit">
 
-    <LinearLayout
+    <FrameLayout
+        android:id="@+id/content"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
         <TextView
             android:id="@+id/camera_textmessage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="@string/camera_select_photo" />
+            android:layout_gravity="center_horizontal"
+            android:text="@string/photo_select" />
 
         <org.dress.mydress.Crop.CropImageView
             xmlns:custom="http://schemas.android.com/apk/res-auto"
@@ -29,28 +30,14 @@
             android:scaleType="centerInside"
             android:layout_gravity="center"/>
 
+    </FrameLayout>
 
+    <android.support.design.widget.BottomNavigationView
+        android:id="@+id/photo_menu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:background="?android:attr/windowBackground"
+        app:menu="@menu/photo_edit_menu" />
 
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:gravity="bottom">
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:id="@+id/buttom_preedit"
-                android:text="@string/camera_preedit" />
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/buttom_select"
-                android:text="@string/camera_photos" />
-
-        </LinearLayout>
-    </LinearLayout>
-
-</android.support.constraint.ConstraintLayout>
+</LinearLayout>
